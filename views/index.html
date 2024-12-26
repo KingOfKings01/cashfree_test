@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cashfree Checkout Integration</title>
+    <link rel="stylesheet" href="../public/styles.css">
+    <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
+    
+  </head>
+  <body>
+    <header>
+      <h1>Cashfree Checkout Integration</h1>
+    </header>
+    <div class="card">
+      <h3>Click below to open the checkout page in current tab</p>
+      <button id="renderBtn">Pay Now</button>
+    </div>
+
+    <script>
+      const cashfree = Cashfree({
+          mode: "sandbox",
+      });
+
+      document.getElementById("renderBtn").addEventListener("click", async () => {
+        try {
+          // Fetch payment session ID from backend
+          const response = await fetch("http://localhost:3000/pay", {
+            method: "POST",
+          });
+
+          const data = await response.json();
+          const paymentSessionId = data.paymentSessionId;
+
+          console.log("paymentSessionId:", paymentSessionId);
+
+          // Initialize checkout options
+          let checkoutOptions = {
+              paymentSessionId: paymentSessionId,
+              redirectTarget: "_self",
+          };
+
+          // Start the checkout process
+          await cashfree.checkout(checkoutOptions);
+
+          // After checkout process, fetch payment status
+          const statusResponse = await fetch(`http://localhost:3000/payment-status/${paymentSessionId}`, {
+            method: "GET",
+          });
+
+          const statusData = await statusResponse.json();
+          console.log("Payment Status:", statusData.orderStatus);
+
+        } catch (err) {
+          console.error("Error:", err);
+        }
+      });
+    </script>
+  </body>
+</html>
