@@ -11,6 +11,7 @@ exports.getPaymentPage = (req, res) => {
 };
 
 exports.processPayment = async (req, res) => {
+  // aasifkhan9605@gmail.com
   const email =  req.body.email                                                                                                                             || process.env.EMAIL
   const phone = req.body.phone                                                                                                                              || process.env.PHONE
   
